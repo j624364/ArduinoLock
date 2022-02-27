@@ -18,7 +18,7 @@ char keys[ROW_NUM][COLUMN_NUM] = {
 
 Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM );
 
-String input_password;
+static String input_password;
 
 void setup() {
   Serial.begin(9600);
