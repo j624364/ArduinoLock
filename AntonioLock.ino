@@ -6,11 +6,8 @@
  * Tutorial page: https://arduinogetstarted.com/tutorials/arduino-door-lock-system-using-password
  */
 
+#include "Config.h"
 #include <Keypad.h>
-
-constexpr int RELAY_PIN  = A0; // the Arduino pin, which connects to the IN pin of relay
-constexpr int ROW_NUM    = 4; //four rows
-constexpr int COLUMN_NUM = 4; //four columns
 
 char keys[ROW_NUM][COLUMN_NUM] = {
   {'1', '2', '3', 'A'},
@@ -19,14 +16,8 @@ char keys[ROW_NUM][COLUMN_NUM] = {
   {'*', '0', '#', 'D'}
 };
 
-constexpr byte pin_rows[ROW_NUM] = {9, 8, 7, 6}; //connect to the row pinouts of the keypad
-constexpr byte pin_column[COLUMN_NUM] = {5, 4, 3, 2}; //connect to the column pinouts of the keypad
-
 Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM );
 
-const char* password_1 = "1234ABC"; // change your password here
-const char* password_2 = "5642CD";  // change your password here
-const char* password_3 = "4545B";   // change your password here
 String input_password;
 
 void setup() {
@@ -45,7 +36,7 @@ void loop() {
     if (key == '*') {
       input_password = ""; // reset the input password
     } else if (key == '#') {
-      if (input_password == password_1 || input_password == password_2 || input_password == password_3) {
+      if (input_password == password) {
         Serial.println("The password is correct, unlocking the door in 20 seconds");
         digitalWrite(RELAY_PIN, LOW);  // unlock the door for 20 seconds
         delay(20000);
