@@ -10,4 +10,7 @@ constexpr byte pin_column[COLUMN_NUM] = {5, 4, 3, 2}; //connect to the column pi
 const char* password = "1234"; // change your password here
 
 constexpr bool DebugMode { false };
-constexpr int WaitTime { 2 * 1000 };
+constexpr int WaitTime { 20 * 1000 };
+
+constexpr int LcdColumns = 20;
+constexpr int LcdRows = 4;

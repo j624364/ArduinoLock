@@ -8,6 +8,7 @@
 
 #include "Config.h"
 #include <Keypad.h>
+#include <LiquidCrystal_I2C.h>
 
 char keys[ROW_NUM][COLUMN_NUM] = {
 	{'1', '2', '3', 'A'},
@@ -17,11 +18,21 @@ char keys[ROW_NUM][COLUMN_NUM] = {
 };
 
 Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM );
+LiquidCrystal_I2C lcd(0x27, LcdColumns, LcdRows);
+
+void display_message(const char* msg, int line_no) {
+	lcd.setCursor(0, line_no);
+	lcd.print(msg);
+}
 
 static String input_password;
 
 void setup() {
 	Serial.begin(9600);
+	lcd.init();
+	lcd.backlight();
+	lcd.clear();
+	display_message("Starting arduino", 0);
 
 	if constexpr (DebugMode) {
 		Serial.println("Debug mode");
@@ -37,11 +48,13 @@ void setup() {
 
 		pinMode(12, OUTPUT);
 		digitalWrite(12, HIGH);
+		display_message("Debug mode started", 1);
 	}
 	else {
 		input_password.reserve(32); // maximum input characters is 32, change if needed
 		pinMode(RELAY_PIN, OUTPUT); // initialize pin as an output.
 		digitalWrite(RELAY_PIN, LOW); // lock the door
+		display_message("Locked!", 1);
 	}
 }
 
@@ -76,25 +89,30 @@ void loop() {
 		char key = keypad.getKey();
 
 		if (key) {
-			Serial.print("Key: ");
-			Serial.print(key);
-			Serial.println();
-
 			if (key == '*') {
 				input_password = ""; // reset the input password
+				lcd.clear();
+				display_message("Password cleared", 0);
 			} else if (key == '#') {
 				if (input_password == password) {
-					Serial.println("Correct password");
+					lcd.clear();
+					display_message("Correct password!", 0);
+					display_message("Unlocked!", 1);
 					digitalWrite(RELAY_PIN, HIGH);  // unlock the door for 20 seconds
 					delay(WaitTime);
 					digitalWrite(RELAY_PIN, LOW); // lock the door
+					lcd.clear();
+					display_message("Locked!", 0);
 				} else {
-					Serial.println("Incorrect Password");
+					lcd.clear();
+					display_message("Incorrect password!", 0);
 				}
 
 				input_password = ""; // reset the input password
 			} else {
 				input_password += key; // append new character to input password string
+				lcd.clear();
+				display_message(input_password.c_str(), 0);
 			}
 		}
 	}
